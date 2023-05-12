@@ -116,7 +116,7 @@ def args_to_gan_model(loss_fn):
     else:
       default_args_dict[name] = arg.default
 
-  def new_loss_fn(gan_model, **kwargs):  # pylint:disable=missing-docstring
+  def new_loss_fn(gan_model, **kwargs):# pylint:disable=missing-docstring
     def _asdict(namedtuple):
       """Returns a namedtuple as a dictionary.
 
@@ -131,6 +131,7 @@ def args_to_gan_model(loss_fn):
         A dictionary version of the tuple.
       """
       return {k: getattr(namedtuple, k) for k in namedtuple._fields}
+
     gan_model_dict = _asdict(gan_model)
 
     # Make sure non-tuple required args are supplied.
@@ -139,8 +140,8 @@ def args_to_gan_model(loss_fn):
     required_args_not_from_tuple = required_args - args_from_tuple
     for arg in required_args_not_from_tuple:
       if arg not in kwargs:
-        raise ValueError('`%s` must be supplied to %s loss function.' % (
-            arg, loss_fn.__name__))
+        raise ValueError(
+            f'`{arg}` must be supplied to {loss_fn.__name__} loss function.')
 
     # Make sure tuple args aren't also supplied as keyword args.
     ambiguous_args = set(gan_model._fields).intersection(set(kwargs.keys()))
@@ -159,7 +160,7 @@ def args_to_gan_model(loss_fn):
     for arg in default_args_dict:
       val_from_tuple = gan_model_dict[arg] if arg in gan_model_dict else None
       val_from_kwargs = kwargs[arg] if arg in kwargs else None
-      assert not (val_from_tuple is not None and val_from_kwargs is not None)
+      assert val_from_tuple is None or val_from_kwargs is None
       if val_from_tuple is not None:
         kwargs[arg] = val_from_tuple
       else:
@@ -170,7 +171,7 @@ def args_to_gan_model(loss_fn):
 
     return loss_fn(**kwargs)
 
-  new_docstring = """The gan_model version of %s.""" % loss_fn.__name__
+  new_docstring = f"""The gan_model version of {loss_fn.__name__}."""
   new_loss_fn.__docstring__ = new_docstring
   new_loss_fn.__name__ = loss_fn.__name__
   new_loss_fn.__module__ = loss_fn.__module__
@@ -297,8 +298,8 @@ def cycle_consistency_loss(cyclegan_model, scope=None, add_summaries=False):
   """
   if not isinstance(cyclegan_model, namedtuples.CycleGANModel):
     raise ValueError(
-        '`cyclegan_model` must be a `CycleGANModel`. Instead, was %s.' %
-        type(cyclegan_model))
+        f'`cyclegan_model` must be a `CycleGANModel`. Instead, was {type(cyclegan_model)}.'
+    )
   return tfgan_losses.cycle_consistency_loss(
       cyclegan_model.model_x2y.generator_inputs, cyclegan_model.reconstructed_x,
       cyclegan_model.model_y2x.generator_inputs, cyclegan_model.reconstructed_y,
@@ -323,7 +324,7 @@ def stargan_generator_loss_wrapper(loss_fn):
     return loss_fn(
         stargan_model.discriminator_generated_data_source_predication, **kwargs)
 
-  new_docstring = """The stargan_model version of %s.""" % loss_fn.__name__
+  new_docstring = f"""The stargan_model version of {loss_fn.__name__}."""
   new_loss_fn.__docstring__ = new_docstring
   new_loss_fn.__name__ = loss_fn.__name__
   new_loss_fn.__module__ = loss_fn.__module__
@@ -349,7 +350,7 @@ def stargan_discriminator_loss_wrapper(loss_fn):
         stargan_model.discriminator_input_data_source_predication,
         stargan_model.discriminator_generated_data_source_predication, **kwargs)
 
-  new_docstring = """The stargan_model version of %s.""" % loss_fn.__name__
+  new_docstring = f"""The stargan_model version of {loss_fn.__name__}."""
   new_loss_fn.__docstring__ = new_docstring
   new_loss_fn.__name__ = loss_fn.__name__
   new_loss_fn.__module__ = loss_fn.__module__
@@ -381,7 +382,7 @@ def stargan_gradient_penalty_wrapper(loss_fn):
         discriminator_scope=stargan_model.discriminator_scope,
         **kwargs)
 
-  new_docstring = """The stargan_model version of %s.""" % loss_fn.__name__
+  new_docstring = f"""The stargan_model version of {loss_fn.__name__}."""
   new_loss_fn.__docstring__ = new_docstring
   new_loss_fn.__name__ = loss_fn.__name__
   new_loss_fn.__module__ = loss_fn.__module__

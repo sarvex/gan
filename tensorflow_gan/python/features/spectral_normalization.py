@@ -187,7 +187,7 @@ def spectral_norm_regularizer(scale, power_iteration_rounds=1,
     ValueError: If scale is negative or if scale is not a float.
   """
   if isinstance(scale, numbers.Integral):
-    raise ValueError('scale cannot be an integer: %s' % scale)
+    raise ValueError(f'scale cannot be an integer: {scale}')
   if isinstance(scale, numbers.Real):
     if scale < 0.0:
       raise ValueError(
@@ -340,6 +340,7 @@ def spectral_normalization_custom_getter(name_filter=_default_name_filter,
         power_iteration_rounds=power_iteration_rounds,
         equality_constrained=equality_constrained,
         training=training,
-        name=(name + '/spectral_normalize'))
+        name=f'{name}/spectral_normalize',
+    )
 
   return _internal_getter

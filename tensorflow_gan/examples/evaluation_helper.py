@@ -48,7 +48,7 @@ def get_or_create_eval_step():
   elif len(eval_steps) > 1:
     raise ValueError('Multiple tensors added to tf.GraphKeys.EVAL_STEP')
   else:
-    counter = tf.compat.v1.get_variable(
+    return tf.compat.v1.get_variable(
         'eval_step',
         shape=[],
         dtype=tf.int64,
@@ -56,9 +56,9 @@ def get_or_create_eval_step():
         trainable=False,
         collections=[
             tf.compat.v1.GraphKeys.LOCAL_VARIABLES,
-            tf.compat.v1.GraphKeys.EVAL_STEP
-        ])
-    return counter
+            tf.compat.v1.GraphKeys.EVAL_STEP,
+        ],
+    )
 
 
 def get_latest_eval_step_value(update_ops):
@@ -162,11 +162,10 @@ class StopAfterNEvalsHook(tf.estimator.SessionRunHook):
     if self._log_progress:
       if self._num_evals is None:
         tf.compat.v1.logging.info('Evaluation [%d]', evals_completed)
-      else:
-        if ((evals_completed % self._log_frequency) == 0 or
+      elif ((evals_completed % self._log_frequency) == 0 or
             (self._num_evals == evals_completed)):
-          tf.compat.v1.logging.info('Evaluation [%d/%d]', evals_completed,
-                                    self._num_evals)
+        tf.compat.v1.logging.info('Evaluation [%d/%d]', evals_completed,
+                                  self._num_evals)
     if self._num_evals is not None and evals_completed >= self._num_evals:
       run_context.request_stop()
 
@@ -513,12 +512,11 @@ def evaluate_repeatedly(checkpoint_dir,
 
   final_ops_hook = tf.estimator.FinalOpsHook(final_ops, final_ops_feed_dict)
   hooks.append(final_ops_hook)
-  num_evaluations = 0
-  for checkpoint_path in checkpoints_iterator(
+  for num_evaluations, checkpoint_path in enumerate(checkpoints_iterator(
       checkpoint_dir,
       min_interval_secs=eval_interval_secs,
       timeout=timeout,
-      timeout_fn=timeout_fn):
+      timeout_fn=timeout_fn), start=1):
 
     session_creator = tf.compat.v1.train.ChiefSessionCreator(
         scaffold=scaffold,
@@ -538,8 +536,6 @@ def evaluate_repeatedly(checkpoint_dir,
       tf.compat.v1.logging.info(
           'Finished evaluation at ' +
           time.strftime('%Y-%m-%d-%H:%M:%S', time.gmtime()))
-    num_evaluations += 1
-
     if (max_number_of_evaluations is not None and
         num_evaluations >= max_number_of_evaluations):
       return final_ops_hook.final_ops_values

@@ -83,11 +83,11 @@ def provide_data(batch_size,
   images = tf.reshape(
       images, shape=[num_batches, batch_size, IMG_SIZE, IMG_SIZE, 3])
   labels = tf.reshape(labels, shape=[num_batches, batch_size, 1])
-  batches = list(
+  return list(
       zip(
           tf.unstack(images, num=num_batches),
-          tf.unstack(labels, num=num_batches)))
-  return batches
+          tf.unstack(labels, num=num_batches),
+      ))
 
 
 def _load_imagenet_dataset(split, data_dir=None, shuffle_files=False):

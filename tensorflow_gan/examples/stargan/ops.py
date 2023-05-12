@@ -47,7 +47,7 @@ def _padding_arg(h, w, input_format):
   elif input_format == 'HWC':
     return [[h, h], [w, w], [0, 0]]
   else:
-    raise ValueError('Input Format %s is not supported.' % input_format)
+    raise ValueError(f'Input Format {input_format} is not supported.')
 
 
 def pad(input_net, padding_size):

@@ -173,8 +173,7 @@ def standardize_batch(inputs,
     The normalized tensor with the same type and shape as `inputs`.
   """
   if data_format not in {'NCHW', 'NHWC'}:
-    raise ValueError(
-        'Invalid data_format {}. Allowed: NCHW, NHWC.'.format(data_format))
+    raise ValueError(f'Invalid data_format {data_format}. Allowed: NCHW, NHWC.')
   if use_cross_replica_mean is None:
     # Default to global batch norm only on TPUs.
     use_cross_replica_mean = (
@@ -192,7 +191,7 @@ def standardize_batch(inputs,
 
   inputs_rank = inputs_shape.ndims
   if inputs_rank is None:
-    raise ValueError('Inputs %s has undefined rank' % inputs.name)
+    raise ValueError(f'Inputs {inputs.name} has undefined rank')
   elif inputs_rank not in [2, 4]:
     raise ValueError(
         'Inputs %s has unsupported rank.'

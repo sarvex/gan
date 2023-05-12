@@ -125,7 +125,7 @@ def get_stage_info(stage_id, **kwargs):
     ValueError: If `stage_id` is not in [0, total number of stages).
   """
   total_num_stages = get_total_num_stages(**kwargs)
-  if not (stage_id >= 0 and stage_id < total_num_stages):
+  if stage_id < 0 or stage_id >= total_num_stages:
     raise ValueError(
         '`stage_id` must be in [0, {0}), but instead was {1}'.format(
             total_num_stages, stage_id))
@@ -546,13 +546,17 @@ def make_scaffold(stage_id, optimizer_var_list, **kwargs):
 
 def make_status_message(model):
   """Makes a string `Tensor` of training status."""
-  return tf.strings.join([
-      'Starting train step: current_image_id: ',
-      tf.as_string(model.current_image_id), ', progress: ',
-      tf.as_string(model.progress), ', num_blocks: {}'.format(model.num_blocks),
-      ', batch_size: {}'.format(model.batch_size)
-  ],
-                         name='status_message')
+  return tf.strings.join(
+      [
+          'Starting train step: current_image_id: ',
+          tf.as_string(model.current_image_id),
+          ', progress: ',
+          tf.as_string(model.progress),
+          f', num_blocks: {model.num_blocks}',
+          f', batch_size: {model.batch_size}',
+      ],
+      name='status_message',
+  )
 
 
 def train(model, **kwargs):

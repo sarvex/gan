@@ -200,9 +200,8 @@ class VirtualBatchnormTest(tf.test.TestCase, absltest.TestCase):
 
     # Fetch reference and examples after virtual batch normalization. Also
     # fetch in variable reuse case.
-    to_fetch = []
+    to_fetch = [vbn1.reference_batch_normalization()]
 
-    to_fetch.append(vbn1.reference_batch_normalization())
     to_fetch.append(vbn2.reference_batch_normalization())
     to_fetch.append(vbn1(tensor1_examples))
     to_fetch.append(vbn2(tensor2_examples))

@@ -238,7 +238,7 @@ class GANEstimatorIntegrationTest(tf.test.TestCase):
     self.assertIn('mse_custom_metric', six.iterkeys(scores))
 
     # Predict.
-    predictions = np.array([x for x in est.predict(predict_input_fn)])
+    predictions = np.array(list(est.predict(predict_input_fn)))
 
     self.assertAllEqual(prediction_size, predictions.shape)
 
@@ -404,11 +404,11 @@ class GANEstimatorWarmStartTest(tf.test.TestCase):
   def test_warm_start_success(self):
     """Test if GANEstimator allows explicit warm start variable assignment."""
     # Regex matches all variable names in ckpt except for new_var.
-    var_regex = '^(?!.*%s.*)' % self.new_variable_name
+    var_regex = f'^(?!.*{self.new_variable_name}.*)'
     warmstart = tf.estimator.WarmStartSettings(
         ckpt_to_initialize_from=self._model_dir, vars_to_warm_start=var_regex)
     est_warm = self._test_warm_start(warm_start_from=warmstart)
-    full_variable_name = 'Generator/%s' % self.new_variable_name
+    full_variable_name = f'Generator/{self.new_variable_name}'
     self.assertIn(full_variable_name, est_warm.get_variable_names())
     equal_vals = np.array_equal(
         est_warm.get_variable_value(full_variable_name),

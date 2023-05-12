@@ -229,11 +229,12 @@ def custom_conv2d(x,
     return tf.layers.conv2d(
         x,
         filters=filters,
-        kernel_size=kernel_shape[0:2],
+        kernel_size=kernel_shape[:2],
         strides=strides,
         padding=padding,
         use_bias=False,
-        kernel_initializer=kernel_initializer)
+        kernel_initializer=kernel_initializer,
+    )
 
   with tf.variable_scope(scope, reuse=reuse):
     return _custom_layer_impl(

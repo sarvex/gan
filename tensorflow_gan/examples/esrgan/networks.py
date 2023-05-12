@@ -72,9 +72,7 @@ def dense_block(x):
   h5 = _conv_block(h4, 32, activation=False)
 
   h5 = tf.keras.layers.Lambda(lambda x: x * 0.2)(h5)
-  h = tf.keras.layers.Add()([h5, x])
-
-  return h
+  return tf.keras.layers.Add()([h5, x])
 
 
 def rrdb(x):
@@ -83,8 +81,7 @@ def rrdb(x):
   h = dense_block(h)
   h = dense_block(h)
   h = tf.keras.layers.Lambda(lambda x: x * 0.2)(h)
-  out = tf.keras.layers.Add()([h, x])
-  return out
+  return tf.keras.layers.Add()([h, x])
 
 
 def upsample(x, filters):
@@ -155,8 +152,7 @@ def generator_network(hparams, num_filters=32, out_channels=3):
       use_bias=True)(
           x)
 
-  model = tf.keras.models.Model(inputs=lr_input, outputs=hr_output)
-  return model
+  return tf.keras.models.Model(inputs=lr_input, outputs=hr_output)
 
 
 def discriminator_network(hparams, num_filters=64):
@@ -204,5 +200,4 @@ def discriminator_network(hparams, num_filters=64):
   x = tf.keras.layers.LeakyReLU(alpha=0.2)(x)
   x = tf.keras.layers.Dense(1)(x)
 
-  model = tf.keras.models.Model(inputs=img, outputs=x)
-  return model
+  return tf.keras.models.Model(inputs=img, outputs=x)

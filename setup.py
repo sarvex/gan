@@ -79,10 +79,7 @@ class Test(TestCommandBase):
       stderr.writeln(final_output)
       stderr.writeln(header)
 
-      if result.wasSuccessful():
-        return 0
-      else:
-        return 1
+      return 0 if result.wasSuccessful() else 1
 
     # Run inside absl.app.run to ensure flags parsing is done.
     return app.run(main)

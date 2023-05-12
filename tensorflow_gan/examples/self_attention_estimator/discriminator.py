@@ -28,9 +28,10 @@ def dsample(x):
   Returns:
     An downsampled version of the input tensor.
   """
-  xd = compat_utils.nn_avg_pool2d(
-      input=x, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='VALID')
-  return xd
+  return compat_utils.nn_avg_pool2d(input=x,
+                                    ksize=[1, 2, 2, 1],
+                                    strides=[1, 2, 2, 1],
+                                    padding='VALID')
 
 
 def block(x, out_channels, name, downsample=True, act=tf.nn.relu):
@@ -58,8 +59,8 @@ def block(x, out_channels, name, downsample=True, act=tf.nn.relu):
       x = dsample(x)
     if downsample or input_channels != out_channels:
       x_0 = ops.snconv2d(x_0, out_channels, 1, 1, 1, 1, name='sn_conv3')
-      if downsample:
-        x_0 = dsample(x_0)
+    if downsample:
+      x_0 = dsample(x_0)
     return x_0 + x
 
 

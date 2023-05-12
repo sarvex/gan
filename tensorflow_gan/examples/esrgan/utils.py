@@ -77,11 +77,11 @@ def visualize_results(image_lr,
 
   if image_dir:
     if train:
-      os.makedirs(image_dir + 'training_results', exist_ok=True)
-      result.save(image_dir + 'training_results/' + 'step_{}.png'.format(step))
+      os.makedirs(f'{image_dir}training_results', exist_ok=True)
+      result.save(f'{image_dir}training_results/' + f'step_{step}.png')
     else:
-      os.makedirs(image_dir + 'val_results', exist_ok=True)
-      result.save(image_dir + 'val_results/' + 'step_{}.png'.format(step))
+      os.makedirs(f'{image_dir}val_results', exist_ok=True)
+      result.save(f'{image_dir}val_results/' + f'step_{step}.png')
 
 
 def network_interpolation(alpha=0.2, phase_1_path=None, phase_2_path=None):
@@ -128,8 +128,8 @@ def get_frechet_inception_distance(real_images, generated_images, batch_size,
       doesn't batch `batch_size`.
   """
   # Validate input dimensions.
-  real_images.shape[0:1].assert_is_compatible_with([batch_size])
-  generated_images.shape[0:1].assert_is_compatible_with([batch_size])
+  real_images.shape[:1].assert_is_compatible_with([batch_size])
+  generated_images.shape[:1].assert_is_compatible_with([batch_size])
 
   # Resize input images.
   size = tfgan.eval.INCEPTION_DEFAULT_IMAGE_SIZE
@@ -140,10 +140,9 @@ def get_frechet_inception_distance(real_images, generated_images, batch_size,
 
   # Compute Frechet Inception Distance.
   num_batches = batch_size // num_inception_images
-  fid = tfgan.eval.frechet_inception_distance(
-      resized_real_images, resized_generated_images, num_batches=num_batches)
-
-  return fid
+  return tfgan.eval.frechet_inception_distance(resized_real_images,
+                                               resized_generated_images,
+                                               num_batches=num_batches)
 
 
 def get_inception_scores(images, batch_size, num_inception_images):
@@ -164,7 +163,7 @@ def get_inception_scores(images, batch_size, num_inception_images):
   """
 
   # Validate inputs.
-  images.shape[0:1].assert_is_compatible_with([batch_size])
+  images.shape[:1].assert_is_compatible_with([batch_size])
   if batch_size % num_inception_images != 0:
     raise ValueError(
         '`batch_size` must be divisible by `num_inception_images`.')
@@ -177,10 +176,7 @@ def get_inception_scores(images, batch_size, num_inception_images):
   # Run images through Inception.
   num_batches = batch_size // num_inception_images
 
-  inc_score = tfgan.eval.inception_score(
-      resized_images, num_batches=num_batches)
-
-  return inc_score
+  return tfgan.eval.inception_score(resized_images, num_batches=num_batches)
 
 
 def get_psnr(real, generated):
@@ -193,6 +189,4 @@ def get_psnr(real, generated):
   Returns:
       PSNR value for the given batch of real and generated images.
   """
-  psnr_value = tf.reduce_mean(tf.image.psnr(generated, real, max_val=256.0))
-
-  return psnr_value
+  return tf.reduce_mean(tf.image.psnr(generated, real, max_val=256.0))

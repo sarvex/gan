@@ -204,9 +204,7 @@ def _sliced_wasserstein_svd(a, b):
   proj_a, proj_b = tf.split(u * sig, 2, axis=0)
   proj_a = _sort_rows(proj_a[:, ::-1], s[0])
   proj_b = _sort_rows(proj_b[:, ::-1], s[0])
-  # Pairwise Wasserstein distance.
-  wdist = tf.reduce_mean(input_tensor=tf.abs(proj_a - proj_b))
-  return wdist
+  return tf.reduce_mean(input_tensor=tf.abs(proj_a - proj_b))
 
 
 def sliced_wasserstein_distance(real_images,

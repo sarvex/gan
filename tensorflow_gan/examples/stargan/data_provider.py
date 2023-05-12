@@ -54,7 +54,8 @@ def provide_dataset(split, batch_size, patch_size, num_parallel_calls=None,
     def _filter(element):
       return element['attributes'][attribute]
     return _filter
-  dss = tuple([ds.filter(_filter_pred(attribute)) for attribute in domains])
+
+  dss = tuple(ds.filter(_filter_pred(attribute)) for attribute in domains)
   ds = tf.data.Dataset.zip(dss)
 
   def _preprocess(*elements):

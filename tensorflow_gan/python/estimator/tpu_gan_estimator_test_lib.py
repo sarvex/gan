@@ -374,9 +374,8 @@ class TPUGANEstimatorIntegrationTest(tf.test.TestCase, parameterized.TestCase):
               params['batch_size'], drop_remainder=True))
       if return_ds:
         return ds
-      else:
-        x, y = tf.compat.v1.data.make_one_shot_iterator(ds).get_next()
-        return x, y
+      x, y = tf.compat.v1.data.make_one_shot_iterator(ds).get_next()
+      return x, y
 
     def eval_input_fn(params):
       data = np.zeros([input_dim], dtype=np.float32)
@@ -385,9 +384,8 @@ class TPUGANEstimatorIntegrationTest(tf.test.TestCase, parameterized.TestCase):
               params['batch_size'], drop_remainder=True))
       if return_ds:
         return ds
-      else:
-        x, y = tf.compat.v1.data.make_one_shot_iterator(ds).get_next()
-        return x, y
+      x, y = tf.compat.v1.data.make_one_shot_iterator(ds).get_next()
+      return x, y
 
     predict_size = 10
 
@@ -544,11 +542,11 @@ class TPUGANEstimatorWarmStartTest(tf.test.TestCase):
   def test_warm_start_success(self):
     """Test if GANEstimator allows explicit warm start variable assignment."""
     # Regex matches all variable names in ckpt except for new_var.
-    var_regex = '^(?!.*%s.*)' % self.new_variable_name
+    var_regex = f'^(?!.*{self.new_variable_name}.*)'
     warmstart = tf.estimator.WarmStartSettings(
         ckpt_to_initialize_from=self._model_dir, vars_to_warm_start=var_regex)
     est_warm = self._test_warm_start(warm_start_from=warmstart)
-    full_variable_name = 'Generator/%s' % self.new_variable_name
+    full_variable_name = f'Generator/{self.new_variable_name}'
     self.assertIn(full_variable_name, est_warm.get_variable_names())
     equal_vals = np.array_equal(
         est_warm.get_variable_value(full_variable_name),

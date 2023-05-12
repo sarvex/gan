@@ -48,13 +48,13 @@ class DataProviderTest(tf.test.TestCase):
 
     output = tf.data.get_output_classes(ds)
     self.assertIsInstance(output, dict)
-    self.assertSetEqual(set(output.keys()), set(['images', 'labels']))
+    self.assertSetEqual(set(output.keys()), {'images', 'labels'})
     self.assertEqual(output['images'], tf.Tensor)
     self.assertEqual(output['labels'], tf.Tensor)
 
     shapes = tf.data.get_output_shapes(ds)
     self.assertIsInstance(shapes, dict)
-    self.assertSetEqual(set(shapes.keys()), set(['images', 'labels']))
+    self.assertSetEqual(set(shapes.keys()), {'images', 'labels'})
     self.assertIsInstance(shapes['images'], tf.TensorShape)
     self.assertIsInstance(shapes['labels'], tf.TensorShape)
     self.assertListEqual(shapes['images'].as_list(), [batch_size, 28, 28, 1])
@@ -62,7 +62,7 @@ class DataProviderTest(tf.test.TestCase):
 
     types = tf.data.get_output_types(ds)
     self.assertIsInstance(types, dict)
-    self.assertSetEqual(set(types.keys()), set(['images', 'labels']))
+    self.assertSetEqual(set(types.keys()), {'images', 'labels'})
     self.assertEqual(types['images'], tf.float32)
     self.assertEqual(types['labels'], tf.float32)
 

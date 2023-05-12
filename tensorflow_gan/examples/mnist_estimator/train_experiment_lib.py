@@ -110,7 +110,7 @@ def write_predictions_to_disk(predictions, out_dir, current_step):
   eval_dir = os.path.join(out_dir, 'outputs')
   if not tf.io.gfile.exists(eval_dir):
     tf.io.gfile.makedirs(eval_dir)
-  fn = os.path.join(eval_dir, 'unconditional_gan_%ssteps.png' % current_step)
+  fn = os.path.join(eval_dir, f'unconditional_gan_{current_step}steps.png')
   with tf.io.gfile.GFile(fn, 'w') as f:
     # Convert tiled_image from float32 in [-1, 1] to unit8 [0, 255].
     img_np = np.squeeze((255 / 2.0) * (tiled_image + 1.0), axis=2)

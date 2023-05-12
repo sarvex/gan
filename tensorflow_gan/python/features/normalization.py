@@ -87,12 +87,12 @@ def instance_norm(inputs,
   inputs_rank = inputs.shape.ndims
 
   if inputs_rank is None:
-    raise ValueError('Inputs %s has undefined rank.' % inputs.name)
+    raise ValueError(f'Inputs {inputs.name} has undefined rank.')
   if data_format not in (DATA_FORMAT_NCHW, DATA_FORMAT_NHWC):
     raise ValueError('data_format has to be either NCHW or NHWC.')
 
   with tf.compat.v1.variable_scope(
-      scope, 'InstanceNorm', [inputs], reuse=reuse):
+        scope, 'InstanceNorm', [inputs], reuse=reuse):
     if data_format == DATA_FORMAT_NCHW:
       reduction_axis = 1
       # For NCHW format, rather than relying on implicit broadcasting, we
@@ -109,8 +109,9 @@ def instance_norm(inputs,
     del moments_axes[0]
     params_shape = inputs_shape[reduction_axis:reduction_axis + 1]
     if not params_shape.is_fully_defined():
-      raise ValueError('Inputs %s has undefined channels dimension %s.' % (
-          inputs.name, params_shape))
+      raise ValueError(
+          f'Inputs {inputs.name} has undefined channels dimension {params_shape}.'
+      )
 
     # Allocate parameters for the beta and gamma of the normalization.
     beta, gamma = None, None
@@ -241,7 +242,7 @@ def group_norm(inputs,
   inputs = tf.convert_to_tensor(value=inputs)
 
   if inputs.shape.ndims is None:
-    raise ValueError('Inputs %s has undefined rank.' % inputs.name)
+    raise ValueError(f'Inputs {inputs.name} has undefined rank.')
   if channels_axis > (inputs.shape.ndims - 1):
     raise ValueError('Axis is out of bounds.')
 

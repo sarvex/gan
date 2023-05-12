@@ -237,7 +237,7 @@ class StarGANEstimatorIntegrationTest(tf.test.TestCase):
     self.assertIn('mse_custom_metric', six.iterkeys(scores))
 
     # PREDICT
-    predictions = np.array([x for x in est.predict(predict_input_fn)])
+    predictions = np.array(list(est.predict(predict_input_fn)))
 
     self.assertAllEqual(prediction_size, predictions.shape)
 

@@ -119,12 +119,14 @@ def _validate_flags():
                            'Must provide `checkpoint_path`.')
   flags.register_validator(
       'generated_x_dir',
-      lambda x: False if (FLAGS.image_set_y_glob and not x) else True,
-      'Must provide `generated_x_dir`.')
+      lambda x: bool(not FLAGS.image_set_y_glob or x),
+      'Must provide `generated_x_dir`.',
+  )
   flags.register_validator(
       'generated_y_dir',
-      lambda x: False if (FLAGS.image_set_x_glob and not x) else True,
-      'Must provide `generated_y_dir`.')
+      lambda x: bool(not FLAGS.image_set_x_glob or x),
+      'Must provide `generated_y_dir`.',
+  )
 
 
 def main(_):

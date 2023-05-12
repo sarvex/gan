@@ -192,19 +192,22 @@ class NetworksTest(tf.test.TestCase):
     self.assertEqual((2, 16, 16, 3), x2_np.shape)
     # The gradient of block_1 is always on.
     self.assertEqual(
-        np.argmax(grad_norms_output[:, 0] > 0), 0,
-        'gradient norms {} for block 1 is not always on'.format(
-            grad_norms_output[:, 0]))
+        np.argmax(grad_norms_output[:, 0] > 0),
+        0,
+        f'gradient norms {grad_norms_output[:, 0]} for block 1 is not always on',
+    )
     # The gradient of block_2 is on after 1 stable stage.
     self.assertEqual(
-        np.argmax(grad_norms_output[:, 1] > 0), 3,
-        'gradient norms {} for block 2 is not on at step 3'.format(
-            grad_norms_output[:, 1]))
+        np.argmax(grad_norms_output[:, 1] > 0),
+        3,
+        f'gradient norms {grad_norms_output[:, 1]} for block 2 is not on at step 3',
+    )
     # The gradient of block_3 is on after 2 stable stage + 1 transition stage.
     self.assertEqual(
-        np.argmax(grad_norms_output[:, 2] > 0), 8,
-        'gradient norms {} for block 3 is not on at step 8'.format(
-            grad_norms_output[:, 2]))
+        np.argmax(grad_norms_output[:, 2] > 0),
+        8,
+        f'gradient norms {grad_norms_output[:, 2]} for block 3 is not on at step 8',
+    )
 
   def test_discriminator_grad_norm_progress(self):
     if tf.executing_eagerly():
@@ -244,19 +247,22 @@ class NetworksTest(tf.test.TestCase):
 
     # The gradient of block_1 is always on.
     self.assertEqual(
-        np.argmax(grad_norms_output[:, 0] > 0), 0,
-        'gradient norms {} for block 1 is not always on'.format(
-            grad_norms_output[:, 0]))
+        np.argmax(grad_norms_output[:, 0] > 0),
+        0,
+        f'gradient norms {grad_norms_output[:, 0]} for block 1 is not always on',
+    )
     # The gradient of block_2 is on after 1 stable stage.
     self.assertEqual(
-        np.argmax(grad_norms_output[:, 1] > 0), 3,
-        'gradient norms {} for block 2 is not on at step 3'.format(
-            grad_norms_output[:, 1]))
+        np.argmax(grad_norms_output[:, 1] > 0),
+        3,
+        f'gradient norms {grad_norms_output[:, 1]} for block 2 is not on at step 3',
+    )
     # The gradient of block_3 is on after 2 stable stage + 1 transition stage.
     self.assertEqual(
-        np.argmax(grad_norms_output[:, 2] > 0), 8,
-        'gradient norms {} for block 3 is not on at step 8'.format(
-            grad_norms_output[:, 2]))
+        np.argmax(grad_norms_output[:, 2] > 0),
+        8,
+        f'gradient norms {grad_norms_output[:, 2]} for block 3 is not on at step 8',
+    )
 
 
 if __name__ == '__main__':

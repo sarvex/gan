@@ -68,9 +68,10 @@ def evaluate(hparams, run_eval_loop=True):
   image_write_ops = None
   if hparams.write_to_disk:
     image_write_ops = tf.io.write_file(
-        '%s/%s' % (hparams.eval_dir, 'conditional_gan.png'),
-        tf.image.encode_png(
-            data_provider.float_image_to_uint8(reshaped_img[0])))
+        f'{hparams.eval_dir}/conditional_gan.png',
+        tf.image.encode_png(data_provider.float_image_to_uint8(
+            reshaped_img[0])),
+    )
 
   # For unit testing, use `run_eval_loop=False`.
   if not run_eval_loop:

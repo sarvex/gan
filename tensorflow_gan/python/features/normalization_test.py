@@ -357,12 +357,9 @@ class GroupNormTest(tf.test.TestCase, absltest.TestCase):
     outputs_shape = (axes_before_channels + [groups, channels // groups] +
                      axes_after_channels)
 
-    # Calculate the final shape for the output statistics.
-    reduced_shape = []
-    for i, a in enumerate(outputs_shape):
-      if i not in reduced_axes:
-        reduced_shape.append(a)
-
+    reduced_shape = [
+        a for i, a in enumerate(outputs_shape) if i not in reduced_axes
+    ]
     if mean_close_to_zero:
       mu_tuple = (1e-4, 1e-2, 1.0)
       sigma_tuple = (1e-2, 0.1, 1.0)

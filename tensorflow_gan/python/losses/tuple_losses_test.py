@@ -121,7 +121,7 @@ def add_loss_consistency_test(test_class, loss_name_str, loss_args):
           sess.run(arg_loss(**loss_args)),
           sess.run(tuple_loss(_tuple_from_dict(loss_args))))
 
-  test_name = 'test_loss_consistency_%s' % loss_name_str
+  test_name = f'test_loss_consistency_{loss_name_str}'
   setattr(test_class, test_name, consistency_test)
 
 

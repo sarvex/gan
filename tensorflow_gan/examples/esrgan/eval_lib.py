@@ -37,10 +37,7 @@ def evaluate(hparams, generator, data):
   fid_metric = tf.keras.metrics.Mean()
   inc_metric = tf.keras.metrics.Mean()
   psnr_metric = tf.keras.metrics.Mean()
-  step = 0
-
-  for lr, hr in data.take(hparams.num_steps):
-    step += 1
+  for step, (lr, hr) in enumerate(data.take(hparams.num_steps), start=1):
     # Generate fake images for evaluating the model
     gen = generator(lr)
 
@@ -54,12 +51,10 @@ def evaluate(hparams, generator, data):
     fid_metric(fid_score)
 
     # Compute Inception Scores.
-    if hparams.eval_real_images:
-      inc_score = utils.get_inception_scores(hr, hparams.batch_size,
-                                             hparams.num_inception_images)
-    else:
-      inc_score = utils.get_inception_scores(gen, hparams.batch_size,
-                                             hparams.num_inception_images)
+    inc_score = (utils.get_inception_scores(hr, hparams.batch_size,
+                                            hparams.num_inception_images)
+                 if hparams.eval_real_images else utils.get_inception_scores(
+                     gen, hparams.batch_size, hparams.num_inception_images))
     inc_metric(inc_score)
 
     # Compute PSNR values.
