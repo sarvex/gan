@@ -31,9 +31,9 @@ class UtilsTest(tf.test.TestCase):
     self.hparams = HParams(256, 4, 11, '/content/')
 
     self.generator1 = networks.generator_network(self.hparams)
-    self.generator1.save(self.hparams.path + '1/')
+    self.generator1.save(f'{self.hparams.path}1/')
     self.generator2 = networks.generator_network(self.hparams)
-    self.generator1.save(self.hparams.path + '2/')
+    self.generator1.save(f'{self.hparams.path}2/')
 
     self.hr_data = tf.random.normal([2, 256, 256, 3])
     self.lr_data = tf.random.normal([2, 64, 64, 3])
@@ -61,8 +61,9 @@ class UtilsTest(tf.test.TestCase):
   def test_interpolation(self):
     """To test the interpolation function."""
     inter_gen = utils.network_interpolation(
-        phase_1_path=self.hparams.path + '1/',
-        phase_2_path=self.hparams.path + '2/')
+        phase_1_path=f'{self.hparams.path}1/',
+        phase_2_path=f'{self.hparams.path}2/',
+    )
     self.assertEqual(type(inter_gen), type(self.generator1))
 
 

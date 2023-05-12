@@ -47,8 +47,8 @@ class VariableClippingOptimizerTest(tf.test.TestCase):
     port1 = get_open_port()
     port2 = get_open_port()
     cs = tf.train.ClusterSpec({
-        "worker": ["localhost:%s" % port1],
-        "ps": ["localhost:%s" % port2]
+        "worker": [f"localhost:{port1}"],
+        "ps": [f"localhost:{port2}"]
     })
 
     worker = tf.distribute.Server(cs, job_name="worker", start=True)

@@ -65,22 +65,19 @@ class ResolutionSchedule(object):
   @property
   def final_resolutions(self):
     """Returns the final resolutions."""
-    return tuple([
-        r * self._scale_base**(self._num_resolutions - 1)
-        for r in self._start_resolutions
-    ])
+    return tuple(r * self._scale_base**(self._num_resolutions - 1)
+                 for r in self._start_resolutions)
 
   def scale_factor(self, block_id):
     """Returns the scale factor for network block `block_id`."""
     if block_id < 1 or block_id > self._num_resolutions:
-      raise ValueError('`block_id` must be in [1, {}]'.format(
-          self._num_resolutions))
+      raise ValueError(f'`block_id` must be in [1, {self._num_resolutions}]')
     return self._scale_base**(self._num_resolutions - block_id)
 
 
 def block_name(block_id):
   """Returns the scope name for the network block `block_id`."""
-  return 'progressive_gan_block_{}'.format(block_id)
+  return f'progressive_gan_block_{block_id}'
 
 
 def min_total_num_images(stable_stage_num_images, transition_stage_num_images,

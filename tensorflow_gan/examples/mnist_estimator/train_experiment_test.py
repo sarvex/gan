@@ -55,11 +55,7 @@ class TrainEstimatorTest(tf.test.TestCase):
     # Check that there's a .png file in the output directory.
     out_dir = os.path.join(hparams.model_dir, 'outputs')
     self.assertTrue(tf.io.gfile.exists(out_dir))
-    has_png = False
-    for f in tf.io.gfile.listdir(out_dir):
-      if f.split('.')[-1] == 'png':
-        has_png = True
-        break
+    has_png = any(f.split('.')[-1] == 'png' for f in tf.io.gfile.listdir(out_dir))
     self.assertTrue(has_png)
 
 if __name__ == '__main__':

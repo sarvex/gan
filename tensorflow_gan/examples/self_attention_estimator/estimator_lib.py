@@ -173,16 +173,15 @@ def get_metrics(real_logits, real_pools, fake_logits, fake_pools, hparams):
     A metric dictionary.
   """
   del hparams
-  metric_dict = {
+  return {
       'eval/real_incscore':
-          tfgan.eval.classifier_score_from_logits_streaming(real_logits),
+      tfgan.eval.classifier_score_from_logits_streaming(real_logits),
       'eval/incscore':
-          tfgan.eval.classifier_score_from_logits_streaming(fake_logits),
+      tfgan.eval.classifier_score_from_logits_streaming(fake_logits),
       'eval/fid':
-          tfgan.eval.frechet_classifier_distance_from_activations_streaming(
-              real_pools, fake_pools),
+      tfgan.eval.frechet_classifier_distance_from_activations_streaming(
+          real_pools, fake_pools),
   }
-  return metric_dict
 
 
 def _generator_summary_ops(generated_images, real_images):

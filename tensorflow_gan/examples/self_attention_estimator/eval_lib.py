@@ -108,16 +108,20 @@ def print_debug_statistics(image, labels, dbg_messge_prefix, on_tpu):
       axis=0,
       keepdims=True)
   image = tf.Print(
-      image, [
+      image,
+      [
           tf.reduce_mean(input_tensor=image_means),
-          tf.reduce_mean(input_tensor=image_vars)
+          tf.reduce_mean(input_tensor=image_vars),
       ],
-      dbg_messge_prefix + ' mean and average var',
-      first_n=1)
+      f'{dbg_messge_prefix} mean and average var',
+      first_n=1,
+  )
   labels = tf.Print(
-      labels, [labels, labels.shape],
-      dbg_messge_prefix + ' sparse labels',
-      first_n=2)
+      labels,
+      [labels, labels.shape],
+      f'{dbg_messge_prefix} sparse labels',
+      first_n=2,
+  )
   return image, labels
 
 
@@ -132,7 +136,7 @@ def log_and_summarize_variables(var_list, dbg_messge, on_tpu):
     # The TPU estimator doesn't support summaries.
     with tf.name_scope(name=None):
       for var in sigma_ratio_vars:
-        tf.summary.scalar('sigma_ratio_vars/' + var.name, var)
+        tf.summary.scalar(f'sigma_ratio_vars/{var.name}', var)
 
 
 def predict_and_write_images(estimator, input_fn, model_dir, filename_suffix):
@@ -159,7 +163,7 @@ def predict_and_write_images(estimator, input_fn, model_dir, filename_suffix):
     tf.io.gfile.makedirs(output_dir)
   # Generate a grid of images and write it to disk.
   image_grid = tfgan.eval.python_image_grid(predictions, grid_shape=(4, 4))
-  grid_fname = os.path.join(output_dir, 'grid_%s.png' % filename_suffix)
+  grid_fname = os.path.join(output_dir, f'grid_{filename_suffix}.png')
   _write_image_to_disk(image_grid, grid_fname)
 
 

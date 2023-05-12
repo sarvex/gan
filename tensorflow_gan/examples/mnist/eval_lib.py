@@ -67,8 +67,9 @@ def evaluate(hparams, run_eval_loop=True):
           images[:100, ...], num_cols=10)
       uint8_images = data_provider.float_image_to_uint8(reshaped_images)
       image_write_ops = tf.io.write_file(
-          '%s/%s' % (hparams.eval_dir, 'unconditional_gan.png'),
-          tf.image.encode_png(uint8_images[0]))
+          f'{hparams.eval_dir}/unconditional_gan.png',
+          tf.image.encode_png(uint8_images[0]),
+      )
 
   # For unit testing, use `run_eval_loop=False`.
   if not run_eval_loop:

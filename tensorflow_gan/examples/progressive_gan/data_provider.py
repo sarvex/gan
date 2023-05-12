@@ -157,9 +157,7 @@ def provide_data(split,
                        num_parallel_calls, shuffle)
 
   next_batch = tf.data.make_one_shot_iterator(ds).get_next()
-  images = next_batch['images']
-
-  return images
+  return next_batch['images']
 
 
 def provide_data_from_image_files(file_pattern,

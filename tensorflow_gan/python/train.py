@@ -113,11 +113,11 @@ def gan_model(
     real_data = _convert_tensor_or_l_or_d(real_data)
     discriminator_real_outputs = discriminator_fn(real_data, generator_inputs)
 
-  if check_shapes:
-    if not generated_data.shape.is_compatible_with(real_data.shape):
-      raise ValueError(
-          'Generator output shape (%s) must be the same shape as real data '
-          '(%s).' % (generated_data.shape, real_data.shape))
+  if check_shapes and not generated_data.shape.is_compatible_with(
+      real_data.shape):
+    raise ValueError(
+        f'Generator output shape ({generated_data.shape}) must be the same shape as real data ({real_data.shape}).'
+    )
 
   # Get model-specific variables.
   generator_variables = contrib.get_trainable_variables(gen_scope)
@@ -284,21 +284,21 @@ def acgan_model(
     generator_inputs = _convert_tensor_or_l_or_d(generator_inputs)
     generated_data = generator_fn(generator_inputs)
   with tf.compat.v1.variable_scope(discriminator_scope) as dis_scope:
-    with tf.compat.v1.name_scope(dis_scope.name + '/generated/'):
+    with tf.compat.v1.name_scope(f'{dis_scope.name}/generated/'):
       (discriminator_gen_outputs, discriminator_gen_classification_logits
       ) = _validate_acgan_discriminator_outputs(
           discriminator_fn(generated_data, generator_inputs))
   with tf.compat.v1.variable_scope(dis_scope, reuse=True):
-    with tf.compat.v1.name_scope(dis_scope.name + '/real/'):
+    with tf.compat.v1.name_scope(f'{dis_scope.name}/real/'):
       real_data = tf.convert_to_tensor(value=real_data)
       (discriminator_real_outputs, discriminator_real_classification_logits
       ) = _validate_acgan_discriminator_outputs(
           discriminator_fn(real_data, generator_inputs))
-  if check_shapes:
-    if not generated_data.shape.is_compatible_with(real_data.shape):
-      raise ValueError(
-          'Generator output shape (%s) must be the same shape as real data '
-          '(%s).' % (generated_data.shape, real_data.shape))
+  if check_shapes and not generated_data.shape.is_compatible_with(
+      real_data.shape):
+    raise ValueError(
+        f'Generator output shape ({generated_data.shape}) must be the same shape as real data ({real_data.shape}).'
+    )
 
   # Get model-specific variables.
   generator_variables = contrib.get_trainable_variables(
@@ -502,19 +502,15 @@ def _validate_aux_loss_weight(aux_loss_weight, name='aux_loss_weight'):
         [tf.compat.v1.debugging.assert_greater_equal(aux_loss_weight, 0.0)]):
       aux_loss_weight = tf.identity(aux_loss_weight)
   elif aux_loss_weight is not None and aux_loss_weight < 0:
-    raise ValueError('`%s` must be greater than 0. Instead, was %s' %
-                     (name, aux_loss_weight))
+    raise ValueError(
+        f'`{name}` must be greater than 0. Instead, was {aux_loss_weight}')
   return aux_loss_weight
 
 
 def _use_aux_loss(aux_loss_weight):
-  if aux_loss_weight is not None:
-    if not isinstance(aux_loss_weight, tf.Tensor):
-      return aux_loss_weight > 0
-    else:
-      return True
-  else:
+  if aux_loss_weight is None:
     return False
+  return True if isinstance(aux_loss_weight, tf.Tensor) else aux_loss_weight > 0
 
 
 def tensor_pool_adjusted_model(model, tensor_pool_fn):
@@ -573,7 +569,7 @@ def tensor_pool_adjusted_model(model, tensor_pool_fn):
         discriminator_gen_outputs=pooled_discriminator_gen_outputs,
         predicted_distributions=pooled_predicted_distributions)
   else:
-    raise ValueError('Tensor pool does not support `model`: %s.' % type(model))
+    raise ValueError(f'Tensor pool does not support `model`: {type(model)}.')
 
 
 def gan_loss(
@@ -772,7 +768,7 @@ def cyclegan_loss(
   # Sanity checks.
   if not isinstance(model, namedtuples.CycleGANModel):
     raise ValueError(
-        '`model` must be a `CycleGANModel`. Instead, was %s.' % type(model))
+        f'`model` must be a `CycleGANModel`. Instead, was {type(model)}.')
 
   # Defines cycle consistency loss.
   cycle_consistency_loss = cycle_consistency_loss_fn(
@@ -956,9 +952,8 @@ def _get_update_ops(kwargs, gen_scope, dis_scope, check_for_unused_ops=True):
       tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.UPDATE_OPS, dis_scope))
 
   if check_for_unused_ops:
-    unused_ops = update_ops - all_gen_ops - all_dis_ops
-    if unused_ops:
-      raise ValueError('There are unused update ops: %s' % unused_ops)
+    if unused_ops := update_ops - all_gen_ops - all_dis_ops:
+      raise ValueError(f'There are unused update ops: {unused_ops}')
 
   gen_update_ops = list(all_gen_ops & update_ops)
   dis_update_ops = list(all_dis_ops & update_ops)
@@ -1006,7 +1001,7 @@ def gan_train_ops(
     saved_params.pop('model', None)
     saved_params.pop('loss', None)
     kwargs = saved_params.pop('kwargs', {})
-    saved_params.update(kwargs)
+    saved_params |= kwargs
     with tf.compat.v1.name_scope('cyclegan_x2y_train'):
       train_ops_x2y = gan_train_ops(model.model_x2y, loss.loss_x2y,
                                     **saved_params)
@@ -1235,11 +1230,7 @@ def gan_train(train_ops,
   _validate_gan_train_inputs(logdir, is_chief, save_summaries_steps,
                              save_checkpoint_secs)
   new_hooks = get_hooks_fn(train_ops)
-  if hooks is not None:
-    hooks = list(hooks) + list(new_hooks)
-  else:
-    hooks = new_hooks
-
+  hooks = list(hooks) + list(new_hooks) if hooks is not None else new_hooks
   with tf.compat.v1.train.MonitoredTrainingSession(
       master=master,
       is_chief=is_chief,
@@ -1321,11 +1312,7 @@ def get_sequential_train_steps(train_steps=namedtuples.GANTrainSteps(1, 1)):
 
     # Run the `should_stop` op after the global step has been incremented, so
     # that the `should_stop` aligns with the proper `global_step` count.
-    if should_stop_op is not None:
-      should_stop = sess.run(should_stop_op)
-    else:
-      should_stop = False
-
+    should_stop = sess.run(should_stop_op) if should_stop_op is not None else False
     return gen_loss + dis_loss, should_stop
 
   return sequential_train_steps
@@ -1429,10 +1416,10 @@ def train_step(sess, train_op, global_step, train_step_kwargs):
                                                            'run_metadata-%d' %
                                                            np_global_step)
 
-  if 'should_log' in train_step_kwargs:
-    if sess.run(train_step_kwargs['should_log']):
-      tf.compat.v1.logging.info('global step %d: loss = %.4f (%.3f sec/step)',
-                                np_global_step, total_loss, time_elapsed)
+  if 'should_log' in train_step_kwargs and sess.run(
+      train_step_kwargs['should_log']):
+    tf.compat.v1.logging.info('global step %d: loss = %.4f (%.3f sec/step)',
+                              np_global_step, total_loss, time_elapsed)
 
   # TODO(joelshor): Figure out why we can't put this into sess.run. The
   # issue right now is that the stop check depends on the global step. The

@@ -43,7 +43,7 @@ def generator(input_images):
   channels = input_size[-1]
   if channels is None:
     raise ValueError(
-        'Last dimension shape must be known but is None: %s' % input_size)
+        f'Last dimension shape must be known but is None: {input_size}')
   output_images, _ = gmodule.cyclegan_generator_resnet(input_images,
                                                        tanh_linear_slope=0.1)
   # Optionally add image to summaries.
@@ -70,7 +70,4 @@ def discriminator(image_batch, unused_conditioning=None):
   logits_4d, _ = d_module.pix2pix_discriminator(
       image_batch, num_filters=[64, 128, 256, 512])
   logits_4d.shape.assert_has_rank(4)
-  # Output of logits is 4D. Reshape to 2D, for TF-GAN.
-  logits_2d = tf.layers.flatten(logits_4d)
-
-  return logits_2d
+  return tf.layers.flatten(logits_4d)

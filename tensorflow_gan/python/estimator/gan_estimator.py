@@ -182,7 +182,7 @@ class GANEstimator(tf.estimator.Estimator):
           tf.estimator.ModeKeys.TRAIN, tf.estimator.ModeKeys.EVAL,
           tf.estimator.ModeKeys.PREDICT
       ]:
-        raise ValueError('Mode not recognized: %s' % mode)
+        raise ValueError(f'Mode not recognized: {mode}')
       real_data = labels  # rename inputs for clarity
       generator_inputs = features  # rename inputs for clarity
 
@@ -239,18 +239,24 @@ def get_gan_model(mode,
                   generator_scope='Generator',
                   discriminator_scope='Discriminator'):
   """Makes the GANModel tuple, which encapsulates the GAN model architecture."""
-  if mode == tf.estimator.ModeKeys.PREDICT:
-    if real_data is not None:
-      raise ValueError('`labels` must be `None` when mode is `predict`. '
-                       'Instead, found %s' % real_data)
-    gan_model = make_prediction_gan_model(generator_inputs, generator_fn,
-                                          generator_scope)
-  else:  # tf.estimator.ModeKeys.TRAIN or tf.estimator.ModeKeys.EVAL
-    gan_model = _make_gan_model(generator_fn, discriminator_fn, real_data,
-                                generator_inputs, generator_scope,
-                                discriminator_scope, add_summaries, mode)
+  if mode != tf.estimator.ModeKeys.PREDICT:
+    return _make_gan_model(
+        generator_fn,
+        discriminator_fn,
+        real_data,
+        generator_inputs,
+        generator_scope,
+        discriminator_scope,
+        add_summaries,
+        mode,
+    )
 
-  return gan_model
+  if real_data is not None:
+    raise ValueError(
+        f'`labels` must be `None` when mode is `predict`. Instead, found {real_data}'
+    )
+  return make_prediction_gan_model(generator_inputs, generator_fn,
+                                   generator_scope)
 
 
 def _make_gan_model(generator_fn, discriminator_fn, real_data, generator_inputs,
@@ -317,9 +323,10 @@ def get_eval_estimator_spec(gan_model, gan_loss, get_eval_metric_ops_fn=None):
     if get_eval_metric_ops_fn is not None:
       custom_eval_metric_ops = get_eval_metric_ops_fn(gan_model)
       if not isinstance(custom_eval_metric_ops, dict):
-        raise TypeError('get_eval_metric_ops_fn must return a dict, '
-                        'received: {}'.format(custom_eval_metric_ops))
-      eval_metric_ops.update(custom_eval_metric_ops)
+        raise TypeError(
+            f'get_eval_metric_ops_fn must return a dict, received: {custom_eval_metric_ops}'
+        )
+      eval_metric_ops |= custom_eval_metric_ops
   return tf.estimator.EstimatorSpec(
       mode=tf.estimator.ModeKeys.EVAL,
       predictions=gan_model.generated_data,
@@ -370,6 +377,4 @@ def extract_gan_loss_args_from_params(params):
     if forbidden_symbol in params:
       raise ValueError('`%s` is not allowed in params.')
 
-  gan_loss_args = {k: params[k] for k in gan_loss_arg_names if k in params}
-
-  return gan_loss_args
+  return {k: params[k] for k in gan_loss_arg_names if k in params}

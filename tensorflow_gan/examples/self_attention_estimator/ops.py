@@ -233,9 +233,10 @@ def sn_conv1x1(x, output_dim, training=True, name='sn_conv1x1'):
         'weights', [1, 1, x.get_shape()[-1], output_dim],
         initializer=tf.keras.initializers.VarianceScaling(
             scale=1.0, mode='fan_avg', distribution='uniform'))
-    conv = tf.nn.conv2d(
-        input=x, filters=w, strides=[1, 1, 1, 1], padding='SAME')
-    return conv
+    return tf.nn.conv2d(input=x,
+                        filters=w,
+                        strides=[1, 1, 1, 1],
+                        padding='SAME')
 
 
 def sn_non_local_block_sim(x, training=True, name='sn_nonlocal'):

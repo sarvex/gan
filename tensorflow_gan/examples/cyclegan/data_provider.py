@@ -81,9 +81,7 @@ def _provide_custom_dataset(image_file_pattern, num_threads=1):
   """
   filenames_ds = tf.data.Dataset.list_files(image_file_pattern)
   bytes_ds = filenames_ds.map(tf.io.read_file, num_parallel_calls=num_threads)
-  images_ds = bytes_ds.map(
-      tf.image.decode_image, num_parallel_calls=num_threads)
-  return images_ds
+  return bytes_ds.map(tf.image.decode_image, num_parallel_calls=num_threads)
 
 
 def _preprocess_datasets(dataset, batch_size, shuffle=True, num_threads=1,

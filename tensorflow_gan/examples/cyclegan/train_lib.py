@@ -48,9 +48,9 @@ def _get_data(image_set_x_file_pattern, image_set_y_file_pattern, batch_size,
   """Returns image Tensors from a custom provider or TFDS."""
   if image_set_x_file_pattern and image_set_y_file_pattern:
     image_file_patterns = [image_set_x_file_pattern, image_set_y_file_pattern]
+  elif image_set_x_file_pattern or image_set_y_file_pattern:
+    raise ValueError('Both image patterns or neither must be provided.')
   else:
-    if image_set_x_file_pattern or image_set_y_file_pattern:
-      raise ValueError('Both image patterns or neither must be provided.')
     image_file_patterns = None
   images_x, images_y = data_provider.provide_custom_data(
       batch_size=batch_size,

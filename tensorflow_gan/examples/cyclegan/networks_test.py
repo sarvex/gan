@@ -93,8 +93,8 @@ class NetworksTest(tf.test.TestCase):
     except (ValueError, tf.errors.InvalidArgumentError):
       # TF raises ValueError, while TF2 raises tf.errors.InvalidArgumentError.
       return
-    except Exception as e:  # pylint: disable=broad-except
-      self.assertTrue(False, msg='Unexpected exception: {}'.format(e))
+    except Exception as e:# pylint: disable=broad-except
+      self.assertTrue(False, msg=f'Unexpected exception: {e}')
     self.assertTrue(False, msg='Expected ValueError or InvalidArgumentError.')
 
 

@@ -167,12 +167,12 @@ def run_continuous_eval(hparams):
   timeout = hparams.debug_params.continuous_eval_timeout_secs
   for ckpt_str in evaluation.checkpoints_iterator(
       hparams.model_dir, timeout=timeout):
-    tf.logging.info('Evaluating checkpoint: %s' % ckpt_str)
+    tf.logging.info(f'Evaluating checkpoint: {ckpt_str}')
     estimator.evaluate(
         train_eval_input_fn,
         steps=hparams.num_eval_steps,
         name='eval_continuous')
-    tf.logging.info('Finished evaluating checkpoint: %s' % ckpt_str)
+    tf.logging.info(f'Finished evaluating checkpoint: {ckpt_str}')
 
 
 # TODO(joelshor): Try to get this to work with

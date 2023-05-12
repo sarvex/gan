@@ -119,9 +119,8 @@ class DataProviderTest(tf.test.TestCase, parameterized.TestCase):
     if tf.executing_eagerly():
       # Eval is not supported when eager execution is enabled.
       return
-    test_image = []
-    for j in range(nrows):
-      test_image.append([[(i // 2 + j) % 256] * 3 for i in range(ncols)])
+    test_image = [[[(i // 2 + j) % 256] * 3 for i in range(ncols)]
+                  for j in range(nrows)]
     test_image = np.array(test_image, dtype=np.uint8)
     improved_image = _transform(test_image, npx=128, is_crop=True, resize_w=128)
     dummy_record = {

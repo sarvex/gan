@@ -1129,16 +1129,12 @@ class GANTrainTest(tf.test.TestCase, parameterized.TestCase):
 
   def _gan_train_ops(self, generator_add, discriminator_add):
     step = tf.compat.v1.train.create_global_step()
-    # Increment the global count every time a train op is run so we can count
-    # the number of times they're run.
-    # NOTE: `use_locking=True` is required to avoid race conditions with
-    # joint training.
-    train_ops = tfgan.GANTrainOps(
+    return tfgan.GANTrainOps(
         generator_train_op=step.assign_add(generator_add, use_locking=True),
-        discriminator_train_op=step.assign_add(
-            discriminator_add, use_locking=True),
-        global_step_inc_op=step.assign_add(1))
-    return train_ops
+        discriminator_train_op=step.assign_add(discriminator_add,
+                                               use_locking=True),
+        global_step_inc_op=step.assign_add(1),
+    )
 
   @parameterized.named_parameters(
       ('gan', create_gan_model),
@@ -1202,8 +1198,7 @@ class GANTrainTest(tf.test.TestCase, parameterized.TestCase):
     number_of_steps = 1
 
     # Typical simple Supervisor use.
-    train_step_kwargs = {}
-    train_step_kwargs['should_stop'] = tf.greater_equal(step, number_of_steps)
+    train_step_kwargs = {'should_stop': tf.greater_equal(step, number_of_steps)}
     train_step_fn = tfgan.get_sequential_train_steps(train_steps)
     sv = tf.compat.v1.train.Supervisor(logdir='', global_step=step)
     with sv.managed_session(master='') as sess:

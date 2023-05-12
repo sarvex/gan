@@ -237,7 +237,7 @@ class TPUGANEstimator(tf.compat.v1.estimator.tpu.TPUEstimator):
           tf.estimator.ModeKeys.TRAIN, tf.estimator.ModeKeys.EVAL,
           tf.estimator.ModeKeys.PREDICT
       ]:
-        raise ValueError('Mode not recognized: %s' % mode)
+        raise ValueError(f'Mode not recognized: {mode}')
       real_data = labels  # rename inputs for clarity
       generator_inputs = features  # rename inputs for clarity
 
@@ -337,17 +337,26 @@ def _get_gan_model_fns(mode,
     if real_data is not None:
       raise ValueError('`labels` must be `None` when mode is `predict`. '
                        'Instead, found %s' % real_data)
-    gan_models = [
-        functools.partial(gan_estimator.make_prediction_gan_model,
-                          generator_inputs, generator_fn, generator_scope)
+    return [
+        functools.partial(
+            gan_estimator.make_prediction_gan_model,
+            generator_inputs,
+            generator_fn,
+            generator_scope,
+        )
     ]
-  else:  # tf.estimator.ModeKeys.TRAIN or tf.estimator.ModeKeys.EVAL
+  else:# tf.estimator.ModeKeys.TRAIN or tf.estimator.ModeKeys.EVAL
     num_models = num_train_models if mode == tf.estimator.ModeKeys.TRAIN else 1
-    gan_models = _make_gan_model_fns(generator_fn, discriminator_fn, real_data,
-                                     generator_inputs, generator_scope,
-                                     discriminator_scope, num_models, mode)
-
-  return gan_models
+    return _make_gan_model_fns(
+        generator_fn,
+        discriminator_fn,
+        real_data,
+        generator_inputs,
+        generator_scope,
+        discriminator_scope,
+        num_models,
+        mode,
+    )
 
 
 def _slice_data(data, num_slices):

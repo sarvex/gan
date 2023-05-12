@@ -156,8 +156,9 @@ class SpectralNormalizationTest(tf.test.TestCase, parameterized.TestCase):
         w_befores.append(w_before)
         self.assertFalse(
             np.allclose(w_initial, w_before),
-            msg=('%s appears not to be normalized. Before: %s After: %s' %
-                 (name, w_initial, w_before)))
+            msg=
+            f'{name} appears not to be normalized. Before: {w_initial} After: {w_before}',
+        )
 
       # Not true for the unnormalized variables.
       for name, var in expected_not_normalized_vars.items():

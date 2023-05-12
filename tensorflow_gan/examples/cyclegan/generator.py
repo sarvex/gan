@@ -96,7 +96,7 @@ def cyclegan_upsample(net,
       net = tf.nn.relu(net)
       net = net[:, 1:, 1:, :]
     else:
-      raise ValueError('Unknown method: [%s]' % method)
+      raise ValueError(f'Unknown method: [{method}]')
 
     return net
 
@@ -205,7 +205,7 @@ def cyclegan_generator_resnet(images,
     ###################
     with tf.variable_scope('residual_blocks'):
       for block_id in xrange(num_resnet_blocks):
-        with tf.variable_scope('block_{}'.format(block_id)):
+        with tf.variable_scope(f'block_{block_id}'):
           res_net = tf.pad(tensor=net, paddings=paddings, mode='REFLECT')
           res_net = _conv2d(res_net, num_filters * 4, kernel_size)
           res_net = _instance_norm(res_net)

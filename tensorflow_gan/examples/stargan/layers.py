@@ -88,24 +88,20 @@ def generator_down_sample(input_net, final_num_outputs=256):
   # Check the rank of input_net.
   input_net.shape.assert_has_rank(4)
 
-  # Check dimension 1 and dimension 2 are defined and divisible by 4.
-  if input_net.shape[1]:
-    if input_net.shape[1] % 4 != 0:
-      raise ValueError(
-          'Dimension 1 of the input should be divisible by 4, but is {} '
-          'instead.'.format(input_net.shape[1]))
-  else:
+  if not input_net.shape[1]:
     raise ValueError('Dimension 1 of the input should be explicitly defined.')
 
-  # Check dimension 1 and dimension 2 are defined and divisible by 4.
-  if input_net.shape[2]:
-    if input_net.shape[2] % 4 != 0:
-      raise ValueError(
-          'Dimension 2 of the input should be divisible by 4, but is {} '
-          'instead.'.format(input_net.shape[2]))
-  else:
+  if input_net.shape[1] % 4 != 0:
+    raise ValueError(
+        f'Dimension 1 of the input should be divisible by 4, but is {input_net.shape[1]} instead.'
+    )
+  if not input_net.shape[2]:
     raise ValueError('Dimension 2 of the input should be explicitly defined.')
 
+  if input_net.shape[2] % 4 != 0:
+    raise ValueError(
+        f'Dimension 2 of the input should be divisible by 4, but is {input_net.shape[2]} instead.'
+    )
   with tf.variable_scope('generator_down_sample'):
     down_sample = ops.pad(input_net, 3)
     down_sample = _conv2d(
@@ -223,17 +219,14 @@ def generator_bottleneck(input_net, residual_block_num=6, num_outputs=256):
   # Check the rank of input_net.
   input_net.shape.assert_has_rank(4)
 
-  # Check dimension 4 of the input_net.
-  if input_net.shape[-1]:
-    if input_net.shape[-1] != num_outputs:
-      raise ValueError(
-          'The last dimension of the input_net should be the same as '
-          'num_outputs: but {} vs. {} instead.'.format(input_net.shape[-1],
-                                                       num_outputs))
-  else:
+  if not input_net.shape[-1]:
     raise ValueError(
         'The last dimension of the input_net should be explicitly defined.')
 
+  if input_net.shape[-1] != num_outputs:
+    raise ValueError(
+        f'The last dimension of the input_net should be the same as num_outputs: but {input_net.shape[-1]} vs. {num_outputs} instead.'
+    )
   with tf.variable_scope('generator_bottleneck'):
 
     bottleneck = input_net
@@ -248,7 +241,8 @@ def generator_bottleneck(input_net, residual_block_num=6, num_outputs=256):
           padding_size=1,
           activation_fn=tf.nn.relu,
           normalizer_fn=tfgan.features.instance_norm,
-          name='residual_block_{}'.format(i))
+          name=f'residual_block_{i}',
+      )
 
   return bottleneck
 
@@ -329,7 +323,8 @@ def discriminator_input_hidden(input_net, hidden_layer=6, init_num_outputs=64):
           filters=num_outputs,
           kernel_size=4,
           stride=2,
-          name='conv_{}'.format(i))
+          name=f'conv_{i}',
+      )
       hidden = tf.nn.leaky_relu(hidden, alpha=0.01)
 
       num_outputs = 2 * num_outputs

@@ -41,9 +41,8 @@ class CheckpointIteratorTest(tf.test.TestCase):
   def testReturnsEmptyIfNoCheckpointsFound(self):
     checkpoint_dir = os.path.join(self.get_temp_dir(), 'no_checkpoints_found')
 
-    num_found = 0
-    for _ in evaluation.checkpoints_iterator(checkpoint_dir, timeout=0):
-      num_found += 1
+    num_found = sum(
+        1 for _ in evaluation.checkpoints_iterator(checkpoint_dir, timeout=0))
     self.assertEqual(num_found, 0)
 
   def testReturnsSingleCheckpointIfOneCheckpointFound(self):
@@ -61,9 +60,8 @@ class CheckpointIteratorTest(tf.test.TestCase):
       save_path = os.path.join(checkpoint_dir, 'model.ckpt')
       saver.save(session, save_path, global_step=global_step)
 
-    num_found = 0
-    for _ in evaluation.checkpoints_iterator(checkpoint_dir, timeout=0):
-      num_found += 1
+    num_found = sum(
+        1 for _ in evaluation.checkpoints_iterator(checkpoint_dir, timeout=0))
     self.assertEqual(num_found, 1)
 
   def testReturnsSingleCheckpointIfOneShardedCheckpoint(self):
@@ -92,9 +90,8 @@ class CheckpointIteratorTest(tf.test.TestCase):
       save_path = os.path.join(checkpoint_dir, 'model.ckpt')
       saver.save(session, save_path, global_step=global_step)
 
-    num_found = 0
-    for _ in evaluation.checkpoints_iterator(checkpoint_dir, timeout=0):
-      num_found += 1
+    num_found = sum(
+        1 for _ in evaluation.checkpoints_iterator(checkpoint_dir, timeout=0))
     self.assertEqual(num_found, 1)
 
   def testTimeoutFn(self):
@@ -449,8 +446,7 @@ class EvaluateRepeatedlyTest(tf.test.TestCase):
         graph_def = event.graph_def
     values = []
     for summary in summaries:
-      for value in summary.value:
-        values.append(value)
+      values.extend(iter(summary.value))
     saved_results = {v.tag: v.simple_value for v in values}
     for name in names_to_values:
       self.assertAlmostEqual(names_to_values[name], saved_results[name], 5)
@@ -474,8 +470,7 @@ class EvaluateRepeatedlyTest(tf.test.TestCase):
 
     names_to_values = {'bread': 3.4, 'cheese': 4.5, 'tomato': 2.0}
 
-    for k in names_to_values:
-      v = names_to_values[k]
+    for k, v in names_to_values.items():
       tf.compat.v1.summary.scalar(k, v)
 
     evaluation.evaluate_repeatedly(

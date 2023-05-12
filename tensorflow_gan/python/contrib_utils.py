@@ -46,7 +46,7 @@ def get_variables_by_name(given_name, scope=None):
   Returns:
     a copied list of variables with the given name and scope.
   """
-  suffix = '/' + given_name + ':|^' + given_name + ':'
+  suffix = f'/{given_name}:|^{given_name}:'
   return get_variables(scope=scope, suffix=suffix)
 
 
@@ -134,10 +134,7 @@ def create_train_op(total_loss,
   # Update ops use GraphKeys.UPDATE_OPS collection if update_ops is None.
   global_update_ops = set(
       tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.UPDATE_OPS))
-  if update_ops is None:
-    update_ops = global_update_ops
-  else:
-    update_ops = set(update_ops)
+  update_ops = global_update_ops if update_ops is None else set(update_ops)
   if not global_update_ops.issubset(update_ops):
     tf.compat.v1.logging.warning(
         'update_ops in create_train_op does not contain all the '
@@ -209,16 +206,15 @@ def add_gradients_summaries(grads_and_vars):
   summaries = []
   for grad, var in grads_and_vars:
     if grad is not None:
-      if isinstance(grad, tf.IndexedSlices):
-        grad_values = grad.values
-      else:
-        grad_values = grad
-      summaries.append(
-          tf.compat.v1.summary.histogram(var.op.name + '_gradient',
-                                         grad_values))
-      summaries.append(
-          tf.compat.v1.summary.scalar(var.op.name + '_gradient_norm',
-                                      tf.linalg.global_norm([grad_values])))
+      grad_values = grad.values if isinstance(grad, tf.IndexedSlices) else grad
+      summaries.extend((
+          tf.compat.v1.summary.histogram(f'{var.op.name}_gradient',
+                                         grad_values),
+          tf.compat.v1.summary.scalar(
+              f'{var.op.name}_gradient_norm',
+              tf.linalg.global_norm([grad_values]),
+          ),
+      ))
     else:
       tf.compat.v1.logging.info('Var %s has no gradient', var.op.name)
 

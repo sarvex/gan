@@ -72,8 +72,8 @@ def clip_variables(optimizer, variables, weight_clip):
   """
   if weight_clip < 0:
     raise ValueError(
-        '`discriminator_weight_clip` must be positive. Instead, was %s' %
-        weight_clip)
+        f'`discriminator_weight_clip` must be positive. Instead, was {weight_clip}'
+    )
   return VariableClippingOptimizer(
       opt=optimizer,
       # Do no reduction, so clipping happens per-value.
@@ -154,7 +154,7 @@ class VariableClippingOptimizer(tf.compat.v1.train.Optimizer):
             continue
           # `x.op` doesn't work in eager execution.
           suffix = var.name if tf.executing_eagerly() else var.op.name
-          with tf.compat.v1.name_scope('clip_' + suffix):
+          with tf.compat.v1.name_scope(f'clip_{suffix}'):
             if isinstance(grad, tf.Tensor):
               clip_update_ops.append(self._clip_dense(var))
             else:

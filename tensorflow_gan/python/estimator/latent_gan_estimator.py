@@ -189,7 +189,7 @@ def get_latent_gan_estimator(generator_fn, discriminator_fn, loss_fn,
   elif warmstart_options:
     # Default WarmStart loads all variable names except INPUT_NAME and
     # OPTIMIZER_NAME.
-    var_regex = '^(?!.*(%s|%s).*)' % (INPUT_NAME, OPTIMIZER_NAME)
+    var_regex = f'^(?!.*({INPUT_NAME}|{OPTIMIZER_NAME}).*)'
     ws = tf.estimator.WarmStartSettings(ckpt_to_initialize_from=ckpt_dir,
                                         vars_to_warm_start=var_regex)
   else:

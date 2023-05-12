@@ -214,7 +214,7 @@ def kl_divergence(p, p_logits, q):
   for tensor in [p, p_logits, q]:
     if not tensor.dtype.is_floating:
       tensor_name = tensor if tf.executing_eagerly() else tensor.name
-      raise ValueError('Input %s must be floating type.' % tensor_name)
+      raise ValueError(f'Input {tensor_name} must be floating type.')
   p.shape.assert_has_rank(2)
   p_logits.shape.assert_has_rank(2)
   q.shape.assert_has_rank(1)
@@ -346,10 +346,7 @@ def _classifier_score_from_logits_helper(logits, streaming=False):
     final_score_tuple = tuple(
         tf.cast(value, logits_dtype) for value in final_score_tuple)
 
-  if streaming:
-    return final_score_tuple
-  else:
-    return final_score_tuple[0]
+  return final_score_tuple if streaming else final_score_tuple[0]
 
 
 def classifier_score_from_logits(logits):
@@ -666,8 +663,8 @@ def diagonal_only_frechet_classifier_distance_from_activations(
   expected_shape = m.get_shape()
 
   if actual_shape != expected_shape:
-    raise ValueError('shape: {} must match expected shape: {}'.format(
-        actual_shape, expected_shape))
+    raise ValueError(
+        f'shape: {actual_shape} must match expected shape: {expected_shape}')
 
   # Compute the two components of FID.
 
@@ -746,10 +743,7 @@ def _frechet_classifier_distance_from_activations_helper(
   result = tuple(
       _calculate_fid(m_val, m_w_val, sigma_val, sigma_w_val)
       for m_val, m_w_val, sigma_val, sigma_w_val in zip(m, m_w, sigma, sigma_w))
-  if streaming:
-    return result
-  else:
-    return result[0]
+  return result if streaming else result[0]
 
 
 def frechet_classifier_distance_from_activations(activations1, activations2):

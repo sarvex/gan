@@ -36,10 +36,7 @@ __all__ = [
 def _get_shape(tensor):
   tensor_shape = tf.shape(input=tensor)
   static_tensor_shape = tf.get_static_value(tensor_shape)
-  if static_tensor_shape is None:
-    return tensor_shape
-  else:
-    return static_tensor_shape
+  return tensor_shape if static_tensor_shape is None else static_tensor_shape
 
 
 def condition_tensor(tensor, conditioning):
@@ -63,8 +60,9 @@ def condition_tensor(tensor, conditioning):
   tensor.shape[1:].assert_is_fully_defined()
   num_features = tensor.shape[1:].num_elements()
   if conditioning.shape.ndims < 2:
-    raise ValueError('conditioning must be at least 2D, but saw shape: %s'
-                     % conditioning.shape)
+    raise ValueError(
+        f'conditioning must be at least 2D, but saw shape: {conditioning.shape}'
+    )
 
   mapped_conditioning = tf.compat.v1.layers.dense(
       tf.compat.v1.layers.flatten(conditioning),

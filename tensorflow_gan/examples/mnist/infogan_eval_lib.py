@@ -142,5 +142,6 @@ def _validate_noises(noises):
 def _get_write_image_ops(eval_dir, filename, images):
   """Create Ops that write images to disk."""
   return tf.io.write_file(
-      '%s/%s' % (eval_dir, filename),
-      tf.image.encode_png(data_provider.float_image_to_uint8(images)))
+      f'{eval_dir}/{filename}',
+      tf.image.encode_png(data_provider.float_image_to_uint8(images)),
+  )

@@ -53,24 +53,21 @@ class DataProviderTest(tf.test.TestCase, parameterized.TestCase):
 
     output = tf.data.get_output_classes(ds)
     self.assertIsInstance(output, dict)
-    self.assertSetEqual(set(output.keys()), set(['images', 'labels']))
+    self.assertSetEqual(set(output.keys()), {'images', 'labels'})
     self.assertEqual(output['images'], tf.Tensor)
     self.assertEqual(output['labels'], tf.Tensor)
 
     shapes = tf.data.get_output_shapes(ds)
     self.assertIsInstance(shapes, dict)
-    self.assertSetEqual(set(shapes.keys()), set(['images', 'labels']))
+    self.assertSetEqual(set(shapes.keys()), {'images', 'labels'})
     self.assertIsInstance(shapes['images'], tf.TensorShape)
     self.assertListEqual(shapes['images'].as_list(), [batch_size, 32, 32, 3])
-    if one_hot:
-      expected_lbls_shape = [batch_size, 10]
-    else:
-      expected_lbls_shape = [batch_size]
+    expected_lbls_shape = [batch_size, 10] if one_hot else [batch_size]
     self.assertListEqual(shapes['labels'].as_list(), expected_lbls_shape)
 
     types = tf.data.get_output_types(ds)
     self.assertIsInstance(types, dict)
-    self.assertSetEqual(set(types.keys()), set(['images', 'labels']))
+    self.assertSetEqual(set(types.keys()), {'images', 'labels'})
     self.assertEqual(types['images'], tf.float32)
     self.assertEqual(types['labels'], tf.float32)
 
@@ -101,10 +98,7 @@ class DataProviderTest(tf.test.TestCase, parameterized.TestCase):
       images, labels = sess.run([images, labels])
     self.assertTupleEqual(images.shape, (batch_size, 32, 32, 3))
     self.assertTrue(np.all(np.abs(images) <= 1))
-    if one_hot:
-      expected_lbls_shape = (batch_size, 10)
-    else:
-      expected_lbls_shape = (batch_size,)
+    expected_lbls_shape = (batch_size, 10) if one_hot else (batch_size, )
     self.assertTupleEqual(labels.shape, expected_lbls_shape)
 
   @mock.patch.object(data_provider, 'tfds', autospec=True)

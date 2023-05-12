@@ -48,8 +48,7 @@ def pretrain_generator(hparams, data):
 
   # If phase_1 training is done, load that generator model.
   if hparams.phase_1:
-    generator = tf.keras.load_model(hparams.model_dir + '/Phase_1/generator/')
-  # If pre-trained model is not available, start training from the beginning
+    generator = tf.keras.load_model(f'{hparams.model_dir}/Phase_1/generator/')
   else:
     generator = networks.generator_network(hparams)
 
@@ -100,8 +99,8 @@ def pretrain_generator(hparams, data):
                                        hparams.decay_factor)
 
   # Save the generator model inside model_dir.
-  os.makedirs(hparams.model_dir + '/Phase_1/generator', exist_ok=True)
-  generator.save(hparams.model_dir + '/Phase_1/generator')
+  os.makedirs(f'{hparams.model_dir}/Phase_1/generator', exist_ok=True)
+  generator.save(f'{hparams.model_dir}/Phase_1/generator')
   logging.info('Saved pre-trained generator network succesfully!')
 
 
@@ -230,17 +229,18 @@ def train_esrgan(hparams, data):
       index += 1
 
   # Save the generator model inside model_dir.
-  os.makedirs(hparams.model_dir + '/Phase_2/generator', exist_ok=True)
-  generator.save(hparams.model_dir + '/Phase_2/generator')
+  os.makedirs(f'{hparams.model_dir}/Phase_2/generator', exist_ok=True)
+  generator.save(f'{hparams.model_dir}/Phase_2/generator')
   logging.info('Saved trained ESRGAN generator succesfully!')
 
   interpolated_generator = utils.network_interpolation(
-      phase_1_path=hparams.model_dir + '/Phase_1/generator',
-      phase_2_path=hparams.model_dir + '/Phase_2/generator')
+      phase_1_path=f'{hparams.model_dir}/Phase_1/generator',
+      phase_2_path=f'{hparams.model_dir}/Phase_2/generator',
+  )
 
   # Save interpolated generator
-  os.makedirs(
-      hparams.model_dir + '/Phase_2/interpolated_generator', exist_ok=True)
+  os.makedirs(f'{hparams.model_dir}/Phase_2/interpolated_generator',
+              exist_ok=True)
   interpolated_generator.save(hparams.model_dir +
                               '/Phase_2/interpolated_generator')
 
@@ -249,5 +249,4 @@ def train_esrgan(hparams, data):
 
 def _get_optimizer(lr=0.0002, beta_1=0.9, beta_2=0.99):
   """Returns the Adam optimizer with the specified learning rate."""
-  optimizer = tf.optimizers.Adam(learning_rate=lr, beta_1=beta_1, beta_2=beta_2)
-  return optimizer
+  return tf.optimizers.Adam(learning_rate=lr, beta_1=beta_1, beta_2=beta_2)

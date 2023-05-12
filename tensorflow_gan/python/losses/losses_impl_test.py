@@ -675,12 +675,11 @@ class CombineAdversarialLossTest(tf.test.TestCase):
       weight_factor = tf.constant(2.0)
       gradient_ratio = None
       adv_coeff = 2.0
-      expected_loss = 1.0 * 2 + adv_coeff * 1.0 * 3
     else:
       weight_factor = None
       gradient_ratio = tf.constant(0.5)
       adv_coeff = 2.0 / (3 * 0.5 + gradient_ratio_epsilon)
-      expected_loss = 1.0 * 2 + adv_coeff * 1.0 * 3
+    expected_loss = 1.0 * 2 + adv_coeff * 1.0 * 3
     combined_loss = tfgan.losses.wargs.combine_adversarial_loss(
         main_loss,
         adversarial_loss,

@@ -167,7 +167,7 @@ class StarGANEstimator(tf.estimator.Estimator):
           tf.estimator.ModeKeys.TRAIN, tf.estimator.ModeKeys.EVAL,
           tf.estimator.ModeKeys.PREDICT
       ]:
-        raise ValueError('Mode not recognized: %s' % mode)
+        raise ValueError(f'Mode not recognized: {mode}')
 
       if mode == tf.estimator.ModeKeys.PREDICT:
         input_data = features[0]
@@ -199,15 +199,17 @@ def get_gan_model(mode,
                   add_summaries,
                   generator_scope='Generator'):
   """Makes the StarGANModel tuple."""
-  if mode == tf.estimator.ModeKeys.PREDICT:
-    gan_model = _make_prediction_gan_model(input_data, input_data_domain_label,
-                                           generator_fn, generator_scope)
-  else:  # tf.estimator.ModeKeys.TRAIN or tf.estimator.ModeKeys.EVAL
-    gan_model = _make_gan_model(generator_fn, discriminator_fn, input_data,
-                                input_data_domain_label, generator_scope,
-                                add_summaries, mode)
-
-  return gan_model
+  return (_make_prediction_gan_model(input_data, input_data_domain_label,
+                                     generator_fn, generator_scope)
+          if mode == tf.estimator.ModeKeys.PREDICT else _make_gan_model(
+              generator_fn,
+              discriminator_fn,
+              input_data,
+              input_data_domain_label,
+              generator_scope,
+              add_summaries,
+              mode,
+          ))
 
 
 def get_estimator_spec(mode,
@@ -309,7 +311,7 @@ def _get_eval_estimator_spec(gan_model,
   with tf.compat.v1.name_scope(name='metrics'):
 
     def _summary_key(head_name, val):
-      return '%s/%s' % (val, head_name) if head_name else val
+      return f'{val}/{head_name}' if head_name else val
 
     eval_metric_ops = {
         _summary_key(name, 'generator_loss'):

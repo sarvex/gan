@@ -69,7 +69,7 @@ def get_image_grid(images, batch_size, num_classes, num_images_per_class):
     A single image.
   """
   # Validate inputs.
-  images.shape[0:1].assert_is_compatible_with([batch_size])
+  images.shape[:1].assert_is_compatible_with([batch_size])
   if batch_size < num_classes * num_images_per_class:
     raise ValueError('Not enough images in batch to show the desired number of '
                      'images.')
@@ -103,7 +103,7 @@ def get_inception_scores(images, batch_size, num_inception_images):
     ValueError: If `batch_size` isn't divisible by `num_inception_images`.
   """
   # Validate inputs.
-  images.shape[0:1].assert_is_compatible_with([batch_size])
+  images.shape[:1].assert_is_compatible_with([batch_size])
   if batch_size % num_inception_images != 0:
     raise ValueError(
         '`batch_size` must be divisible by `num_inception_images`.')
@@ -115,10 +115,7 @@ def get_inception_scores(images, batch_size, num_inception_images):
 
   # Run images through Inception.
   num_batches = batch_size // num_inception_images
-  inc_score = tfgan.eval.inception_score(
-      resized_images, num_batches=num_batches)
-
-  return inc_score
+  return tfgan.eval.inception_score(resized_images, num_batches=num_batches)
 
 
 def get_frechet_inception_distance(real_images, generated_images, batch_size,
@@ -141,8 +138,8 @@ def get_frechet_inception_distance(real_images, generated_images, batch_size,
       doesn't batch `batch_size`.
   """
   # Validate input dimensions.
-  real_images.shape[0:1].assert_is_compatible_with([batch_size])
-  generated_images.shape[0:1].assert_is_compatible_with([batch_size])
+  real_images.shape[:1].assert_is_compatible_with([batch_size])
+  generated_images.shape[:1].assert_is_compatible_with([batch_size])
 
   # Resize input images.
   size = tfgan.eval.INCEPTION_DEFAULT_IMAGE_SIZE
@@ -153,7 +150,6 @@ def get_frechet_inception_distance(real_images, generated_images, batch_size,
 
   # Compute Frechet Inception Distance.
   num_batches = batch_size // num_inception_images
-  fid = tfgan.eval.frechet_inception_distance(
-      resized_real_images, resized_generated_images, num_batches=num_batches)
-
-  return fid
+  return tfgan.eval.frechet_inception_distance(resized_real_images,
+                                               resized_generated_images,
+                                               num_batches=num_batches)

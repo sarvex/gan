@@ -51,8 +51,7 @@ def _expected_mean_only_fid(real_imgs, gen_imgs):
   m = np.mean(real_imgs, axis=0)
   m_v = np.mean(gen_imgs, axis=0)
   mean = np.square(m - m_v).sum()
-  mofid = mean
-  return mofid
+  return mean
 
 
 def _expected_diagonal_only_fid(real_imgs, gen_imgs):
@@ -63,8 +62,7 @@ def _expected_diagonal_only_fid(real_imgs, gen_imgs):
   sqcc = np.sqrt(var * var_v)
   mean = (np.square(m - m_v)).sum()
   trace = (var + var_v - 2 * sqcc).sum()
-  dofid = mean + trace
-  return dofid
+  return mean + trace
 
 
 def _expected_fid(real_imgs, gen_imgs):
@@ -75,8 +73,7 @@ def _expected_fid(real_imgs, gen_imgs):
   sqcc = scp_linalg.sqrtm(np.dot(sigma, sigma_v))
   mean = np.square(m - m_v).sum()
   trace = np.trace(sigma + sigma_v - 2 * sqcc)
-  fid = mean + trace
-  return fid
+  return mean + trace
 
 
 def _expected_trace_sqrt_product(sigma, sigma_v):
@@ -481,19 +478,15 @@ class FrechetTest(tf.test.TestCase, parameterized.TestCase):
       test_pool_reals.append(np.float32(np.random.randn(2048, 256) * i))
       test_pool_gens.append(np.float32(np.random.randn(2048, 256) * i))
 
-    fid_ops = []
-    for i in range(len(test_pool_reals)):
-      fid_ops.append(
-          tfgan.eval.frechet_classifier_distance(
-              test_pool_reals[i],
-              test_pool_gens[i],
-              classifier_fn=lambda x: x))
-
+    fid_ops = [
+        tfgan.eval.frechet_classifier_distance(test_pool_reals[i],
+                                               test_pool_gens[i],
+                                               classifier_fn=lambda x: x)
+        for i in range(len(test_pool_reals))
+    ]
     fids = []
     with self.cached_session() as sess:
-      for fid_op in fid_ops:
-        fids.append(sess.run(fid_op))
-
+      fids.extend(sess.run(fid_op) for fid_op in fid_ops)
     # Check that the FIDs increase monotonically.
     self.assertTrue(all(fid_a < fid_b for fid_a, fid_b in zip(fids, fids[1:])))
 
@@ -557,8 +550,8 @@ class KernelTest(tf.test.TestCase, parameterized.TestCase):
             max_block_size=block_size)
         expected_kid, expected_std = _expected_kid_and_std(
             test_pool_real_a, test_pool_gen_a, max_block_size=block_size)
-        actual_expected_l.append((actual_kid, expected_kid))
-        actual_expected_l.append((actual_std, expected_std))
+        actual_expected_l.extend(
+            ((actual_kid, expected_kid), (actual_std, expected_std)))
     else:
       max_block_size = tf.compat.v1.placeholder(tf.int32, shape=())
       kid_op = tfgan.eval.kernel_classifier_distance_and_std_from_activations(
@@ -572,9 +565,8 @@ class KernelTest(tf.test.TestCase, parameterized.TestCase):
                                             {max_block_size: block_size})
         expected_kid, expected_std = _expected_kid_and_std(
             test_pool_real_a, test_pool_gen_a, max_block_size=block_size)
-        actual_expected_l.append((actual_kid, expected_kid))
-        actual_expected_l.append((actual_std, expected_std))
-
+        actual_expected_l.extend(
+            ((actual_kid, expected_kid), (actual_std, expected_std)))
     for actual, expected in actual_expected_l:
       self.assertAllClose(expected, actual, 0.001)
 
